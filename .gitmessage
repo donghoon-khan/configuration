@@ -1,0 +1,47 @@
+# (If applied, this commit will...) <type>: <subject> (Max 50 char)
+# |<----  Using a Maximum Of 50 Characters  ---->|
+
+
+# Explain why this change is being made
+# |<----   Try To Limit Each Line to a Maximum Of 72 Characters   ---->|
+
+
+# Issue Tracker Number or URL
+
+
+# Provide links or keys to any relevant tickets, articles or other resources
+# Use issues and merge requests' full URLs instead of short references,
+# as they are displayed as plain text outside of GitLab
+
+# --- COMMIT END ---
+# Type can be
+#   feat    : new feature
+#   fix     : bug fix
+#   refactor: refactoring production code
+#   style   : formatting, missing semi colons, etc; no code change
+#   docs    : changes to documentation
+#   test    : adding or refactoring tests
+#             no productin code change
+#   chore   : updating grunt tasks etc
+#             no production code change
+# ------------------
+# Remember to
+#    Capitalize the subject line.
+#        제목은 대문자로 시작한다.
+#    Use the imperative mood in the subject line.
+#        제목은 명령어로 작성한다.
+#    Do not end the subject line with a period.
+#        마침표로 제목을 끝내지 않는다.
+#    Subject must contain at least 3 words.
+#        제목은 3단어 이상으로 작성한다.
+#    Separate subject from body with a blank line.
+#        제목과 본문 사이에는 빈줄을 넣어서 구분한다.
+#    describe these changes in the commit body.
+#        본문에서 이러한 변경사항을 설명한다.
+#    Do not use Emojis.
+#        Emojis를 사용하지 않는다.
+#    Use the body to explain what and why vs. how.
+#        본문에는 How보다는 What과 Why를 설명한다.
+#    Can use multiple lines with "-" for bullet points in body.
+#        본문의 목록은 "-"를 사용해 나타낸다.
+# --------------------

@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "onm-service.fullname" . }}
+  labels:
+    {{- include "onm-service.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "onm-service.fullname" . }}
+  replicas: 1
+  updateStrategy:
+    type: {{ .Values.updateStrategy.type }}
+    {{- if (eq "Recreate" .Values.updateStrategy.type) }}
+    rollingUpdate: null
+    {{- end }}
+  selector:
+    matchLabels:
+      {{- include "onm-service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "onm-service.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "onm-service.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.service.livenessProbe.path }}
+              port: http
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.service.readinessProbe.path }}
+              port: http
+          env:
+            {{- if .Values.extraEnvs }}
+{{ toYaml .Values.extraEnvs | indent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: media-data
+              mountPath: {{ .Values.media.mountPath }}
+      volumes:
+{{- if and .Values.media.persistence.enabled .Values.media.persistence.existingClaim }}
+        - name: media-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.media.persistence.existingClaim }}
+{{- else if not .Values.media.persistence.enabled }}
+        - name: media-data
+          emptyDir: {}
+{{- else if and .Values.media.persistence.enabled (not .Values.media.persistence.existingClaim) }}
+  volumeClaimTemplates:
+    - metadata:
+        name: media-data
+        labels:
+          {{- include "onm-service.selectorLabels" . | nindent 10 }}
+      spec:
+        storageClassName: {{ .Values.fileUpload.persistence.storageClassName }}
+        accessModes:
+        {{- range .Values.fileUpload.persistence.accessModes }}
+          - {{ . | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.fileUpload.persistence.size | quote }}
+{{- end }}
